@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drawing tools</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+function initMap() {
+  var map = new google.maps.Map(document.getElementById('map'), {
+    center: new google.maps.LatLng(42.349457,-71.100739),
+    zoom: 4
+  });
+  
+  var selectedShape;
+
+  function clearShape() {
+    if (selectedShape) {
+      selectedShape.setEditable(false);
+      selectedShape.setMap(null);
+      selectedShape = null;
+    }
+  }
+
+  function setSelection(shape) {
+    clearShape();
+    selectedShape = shape;
+    shape.setEditable(true);
+    selectColor(shape.get('fillColor') || shape.get('strokeColor'));
+  }
+
+  var drawingManager = new google.maps.drawing.DrawingManager({
+    drawingMode: google.maps.drawing.OverlayType.MARKER,
+    drawingControl: true,
+    drawingControlOptions: {
+      position: google.maps.ControlPosition.TOP_RIGHT,
+      drawingModes: [
+        google.maps.drawing.OverlayType.MARKER,
+        //google.maps.drawing.OverlayType.CIRCLE,
+        google.maps.drawing.OverlayType.RECTANGLE
+      ]
+    },
+  });
+
+
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(e) {
+        if (e.type != google.maps.drawing.OverlayType.MARKER) {
+        //reset drawing mode after drawing a shape.
+        drawingManager.setDrawingMode(null);
+
+       var newShape = e.overlay;
+        newShape.type = e.type;
+        setSelection(newShape);
+      }
+    });
+
+    drawingManager.setMap(map);
+
+    //Delete the current shape when the drawing mode is changed, or when the map is clicked.
+    google.maps.event.addListener(drawingManager, 'drawingmode_changed', clearShape);
+    google.maps.event.addListener(map, 'click', clearShape);
+}
+
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2soF--GqM4WkkKQyAdwSTyYkvzBTfO14&signed_in=true&libraries=drawing&callback=initMap"
+         async defer></script>
+  </body>
+</html>
