@@ -35,8 +35,7 @@
     	var ex2 = document.getElementById('option2');
 
     	ex1.onclick = initMap;
-    	ex2.onclick = initMap;
-
+    	ex2.onclick = initMap;    	
     }
 	</script>
   </head>
@@ -82,11 +81,11 @@ function initMap() {
        minX = strictBounds.getSouthWest().lng(), 
        minY = strictBounds.getSouthWest().lat(); 
 
-   if (x < minX) x = minX; 
-   if (x > maxX) x = maxX; 
-   if (y < minY) y = minY; 
-   if (y > maxY) y = maxY; 
-   map.setCenter(new google.maps.LatLng(y, x)); });
+		if (x < minX) x = minX; 
+		if (x > maxX) x = maxX; 
+		if (y < minY) y = minY; 
+		if (y > maxY) y = maxY; 
+		map.setCenter(new google.maps.LatLng(y, x)); });
    // - See more at: http://www.devx.com/webdev/advanced-google-maps-functionality-tutorial.html#sthash.ieJ3kq94.dpuf
   
   var selectedShape;
@@ -109,7 +108,6 @@ function initMap() {
   function addListenerToMap(){
 	
 	var rectButton = document.getElementById('option1');
-	//alert(rectButton.checked);
 	if(rectButton.checked)
 	{
 		var drawingManagerRectangle = new google.maps.drawing.DrawingManager({
@@ -121,7 +119,7 @@ function initMap() {
         google.maps.drawing.OverlayType.RECTANGLE
 		]
 		},
-		  
+ 
 		rectangleOptions: {
 			strokeColor: '#FF0000',
 			strokeOpacity: 0.8,
@@ -141,21 +139,21 @@ function initMap() {
 				var NWLng = NE.lng();
 				var SELat = NE.lat();
 				var SELng = SW.lng();
-				/*var infowindowNE = new google.maps.InfoWindow({
+				var infowindowNE = new google.maps.InfoWindow({
 					content: '<p>' + NE + '</p>'
 					});
-				infowindowNE.open(map,NE);*/
+				infowindowNE.open(map,NE);
 				
 			}
-		
+		 
     
-			//reset drawing mode after drawing a shape.
-			drawingManagerRectangle.setDrawingMode(null);
+      //reset drawing mode after drawing a shape.
+      drawingManagerRectangle.setDrawingMode(null);
 
-			var newShape = e.overlay;
-			newShape.type = e.type;
-			setSelection(newShape);
-			//clearShape;
+      var newShape = e.overlay;
+      newShape.type = e.type;
+      setSelection(newShape);
+      //clearShape;
 		});
 		drawingManagerRectangle.setMap(map);
 		
@@ -175,15 +173,39 @@ function initMap() {
         google.maps.drawing.OverlayType.MARKER
 		]
 		},
-		
+		/* markerOptions: {
+		draggable: true
+		},*/
+  
+		/* rectangleOptions: {
+		strokeColor: '#FF0000',
+		strokeOpacity: 0.8,
+		strokeWeight: 2,
+		fillColor: '#FF0000',
+		fillOpacity: 0.35,  
+		}*/
 
 		});
 		google.maps.event.addListener(drawingManagerMarker, 'overlaycomplete', function(e) {
-		 if (e.type == google.maps.drawing.OverlayType.MARKER) {
+		if (e.type == google.maps.drawing.OverlayType.MARKER) {
+			map.panTo(e.overlay.getPosition());
+			map.setZoom(7);
 			var infowindow = new google.maps.InfoWindow({
 			content: '<p>Location:' + e.overlay.getPosition() + '</p>'
 			});
 		infowindow.open(map,e.overlay);
+		var circle = new google.maps.Circle({
+			radius: 250*1000, 
+			center: e.overlay,
+			map: map,
+			fillColor: '#FF0000',
+			fillOpacity: 0.2,
+			strokeColor: '#FF0000',
+			strokeOpacity: 0.6
+		    }); 
+			
+			circle.bindTo('center',e.overlay,'position');
+			
       }
     
       //reset drawing mode after drawing a shape.
