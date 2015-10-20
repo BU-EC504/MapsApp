@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author haydarkarrar
  */
-@XmlRootElement
 public class Location {
 
     public Location(String name, double longitude, double latitude) {
