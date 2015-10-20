@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drawing tools</title>
+    <title>Maps App</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -61,6 +61,7 @@
 	<br />
     <script>
 	var map;
+	
 function initMap() {
    map = new google.maps.Map(document.getElementById('map'), {
     center: new google.maps.LatLng(42.349457,-71.100739),
@@ -157,6 +158,19 @@ function initMap() {
 					var point = new google.maps.LatLng(ptLat,ptLng);
 					var marker2 = new google.maps.Marker({position:point, map:map});
 					
+										
+					google.maps.event.addListener(marker2, 'mouseover', function() {
+												
+							this.info = new google.maps.InfoWindow({
+							content: this.getPosition().lat()+","+this.getPosition().lng(),
+							map: map
+							});
+						this.info.open(map, this);
+						});
+						google.maps.event.addListener(marker2, 'mouseout', function() {
+							this.info.close();
+							});
+						
 					markers.push(marker2);
 					
 					}
@@ -189,7 +203,7 @@ function initMap() {
 		]
 		},
 		/* markerOptions: {
-		draggable: true
+		 icon: pinImage,
 		},*/
   
 		/* rectangleOptions: {
@@ -205,6 +219,7 @@ function initMap() {
 		if (e.type == google.maps.drawing.OverlayType.MARKER) {
 			map.panTo(e.overlay.getPosition());
 			map.setZoom(7);
+			e.overlay.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')			
 			var infowindow = new google.maps.InfoWindow({
 			content: '<p>Location:' + e.overlay.getPosition() + '</p>'
 			});
@@ -234,6 +249,24 @@ function initMap() {
 		            position:newmappoint,
 		            map: map
         		});
+				
+				
+				google.maps.event.addListener(randMarker, 'mouseover', function() {										
+					
+							this.info = new google.maps.InfoWindow({
+							content: this.getPosition().lat()+","+this.getPosition().lng(),
+							map: map
+							});
+							
+						this.info.open(map, this);
+						});
+						
+						google.maps.event.addListener(randMarker, 'mouseout', function() {
+							this.info.close();
+							});
+						
+										
+					
         		markers.push(randMarker);
 			};
 
@@ -245,6 +278,19 @@ function initMap() {
 		            position:newmappoint,
 		            map: map
         		});
+								google.maps.event.addListener(randMarker, 'mouseover', function() {										
+					
+							this.info = new google.maps.InfoWindow({
+							content: this.getPosition().lat()+","+this.getPosition().lng(),
+							map: map
+							});
+							
+						this.info.open(map, this);
+						});
+						
+						google.maps.event.addListener(randMarker, 'mouseout', function() {
+							this.info.close();
+							});
         		markers.push(randMarker);
 			};
       }
