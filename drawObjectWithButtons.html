@@ -165,7 +165,6 @@ function initMap() {
 	}
 	else
 	{
-	
 		var drawingManagerMarker = new google.maps.drawing.DrawingManager({
 		drawingMode: google.maps.drawing.OverlayType.MARKER,
 		drawingControl: true,
@@ -207,9 +206,26 @@ function initMap() {
 		    }); 
 			
 			circle.bindTo('center',e.overlay,'position');
+
+			var markerLat;
+			var markerLng;
 			
+
+			for (var i = 0; i < 10; i++) {
+				markerLat = getRandomArbitrary(e.overlay.getPosition().lat(), e.overlay.getPosition().lat()+circle.radius);
+				markerLng = getRandomArbitrary(e.overlay.getPosition().lng(), e.overlay.getPosition().lng()+circle.radius);
+				alert(markerLat); alert(markerLng);
+				var newmappoint = new google.maps.LatLng(markerLat, markerLng);
+        		var marker = new google.maps.Marker({
+		            position:newmappoint,
+		            map: map,
+        		});
+        		alert(2);
+
+			};
       }
     
+
       //reset drawing mode after drawing a shape.
       drawingManagerMarker.setDrawingMode(null);
 
@@ -225,12 +241,13 @@ function initMap() {
 		google.maps.event.addListener(drawingManagerMarker, 'drawingmode_changed', clearShape);
 		google.maps.event.addListener(map, 'click', clearShape);
 	}
-   
-	
-	  
-  
+    
 }
 
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
  
   }
     </script>
