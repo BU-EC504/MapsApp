@@ -14,8 +14,12 @@
 		background-repeat: no-repeat;
 		background-size: 100%;
       }
-      #map {
-        height: 100%;
+	  #map {
+	     min-width: 200px;
+		width: 95%;
+		min-height: 200px;
+		height: 75%;
+		margin-left:30px;		
       }
     </style>
 	<!-- Latest compiled and minified CSS -->
@@ -32,7 +36,6 @@
 
     	ex1.onclick = initMap;
     	ex2.onclick = initMap;
-    	//ex3.onclick = handler;
 
     }
 	</script>
@@ -41,7 +44,7 @@
     <div id="border">
 	<br/>
 	<br/>
-		<div class="btn-group" style="margin-left:15px;" >
+		<div class="btn-group" style="margin-left:30px;" >
 			<label class="btn btn-primary btn-lg active">
 				<input type="radio" name="options" id="option1" checked > Reference points in an area
 			</label>
@@ -52,7 +55,7 @@
 	</div>
 	<br/>
 	<br />
-    <div style="margin-left:15px;margin-right:15px" id="map"></div>
+    <div id="map"></div>
 	<br/>
 	<br />
     <script>
@@ -114,16 +117,11 @@ function initMap() {
 		drawingControl: true,
 		drawingControlOptions: {
 		position: google.maps.ControlPosition.TOP_RIGHT,
-		drawingModes: [
-        //google.maps.drawing.OverlayType.MARKER,
-        //google.maps.drawing.OverlayType.CIRCLE,
+		drawingModes: [        
         google.maps.drawing.OverlayType.RECTANGLE
 		]
 		},
-		/* markerOptions: {
-		draggable: true
-		},*/
-  
+		  
 		rectangleOptions: {
 			strokeColor: '#FF0000',
 			strokeOpacity: 0.8,
@@ -143,28 +141,21 @@ function initMap() {
 				var NWLng = NE.lng();
 				var SELat = NE.lat();
 				var SELng = SW.lng();
-				var infowindowNE = new google.maps.InfoWindow({
+				/*var infowindowNE = new google.maps.InfoWindow({
 					content: '<p>' + NE + '</p>'
 					});
-				infowindowNE.open(map,NE);
+				infowindowNE.open(map,NE);*/
 				
 			}
-
-		/*else if (e.type == google.maps.drawing.OverlayType.MARKER) {
-        var infowindow = new google.maps.InfoWindow({
-          content: '<p>Location:' + e.overlay.getPosition() + '</p>'
-        });
-        infowindow.open(map,e.overlay);
-		}*/
-		 
+		
     
-      //reset drawing mode after drawing a shape.
-      drawingManagerRectangle.setDrawingMode(null);
+			//reset drawing mode after drawing a shape.
+			drawingManagerRectangle.setDrawingMode(null);
 
-      var newShape = e.overlay;
-      newShape.type = e.type;
-      setSelection(newShape);
-      //clearShape;
+			var newShape = e.overlay;
+			newShape.type = e.type;
+			setSelection(newShape);
+			//clearShape;
 		});
 		drawingManagerRectangle.setMap(map);
 		
@@ -181,36 +172,14 @@ function initMap() {
 		drawingControlOptions: {
 		position: google.maps.ControlPosition.TOP_RIGHT,
 		drawingModes: [
-        google.maps.drawing.OverlayType.MARKER//,
-        //google.maps.drawing.OverlayType.CIRCLE,
-		// google.maps.drawing.OverlayType.RECTANGLE
+        google.maps.drawing.OverlayType.MARKER
 		]
 		},
-		/* markerOptions: {
-		draggable: true
-		},*/
-  
-		/* rectangleOptions: {
-		strokeColor: '#FF0000',
-		strokeOpacity: 0.8,
-		strokeWeight: 2,
-		fillColor: '#FF0000',
-		fillOpacity: 0.35,  
-		}*/
+		
 
 		});
 		google.maps.event.addListener(drawingManagerMarker, 'overlaycomplete', function(e) {
-		/*if (e.type == google.maps.drawing.OverlayType.RECTANGLE) {
-        bounds = e.overlay.getBounds();
-        var NE = bounds.getNorthEast();
-        var SW = bounds.getSouthWest();
-        var NWLat = SW.lat();
-        var NWLng = NE.lng();
-        var SELat = NE.lat();
-        var SELng = SW.lng();
-		}
-
-      else*/ if (e.type == google.maps.drawing.OverlayType.MARKER) {
+		 if (e.type == google.maps.drawing.OverlayType.MARKER) {
 			var infowindow = new google.maps.InfoWindow({
 			content: '<p>Location:' + e.overlay.getPosition() + '</p>'
 			});
@@ -218,7 +187,7 @@ function initMap() {
       }
     
       //reset drawing mode after drawing a shape.
-      //drawingManagerRectangle.setDrawingMode(null);
+      drawingManagerMarker.setDrawingMode(null);
 
 		var newShape = e.overlay;
 		newShape.type = e.type;
