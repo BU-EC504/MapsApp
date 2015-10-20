@@ -225,17 +225,27 @@ function initMap() {
 			var markerLng;
 			
 
-			for (var i = 0; i < 10; i++) {
-				markerLat = getRandomArbitrary(e.overlay.getPosition().lat(), e.overlay.getPosition().lat()+circle.radius);
-				markerLng = getRandomArbitrary(e.overlay.getPosition().lng(), e.overlay.getPosition().lng()+circle.radius);
-				alert(markerLat); alert(markerLng);
+			for (var i = 0; i < 5; i++) {
+				markerLat = getRandomArbitrary(e.overlay.getPosition().lat(), e.overlay.getPosition().lat()+1.5);
+				markerLng = getRandomArbitrary(e.overlay.getPosition().lng(), e.overlay.getPosition().lng()+1.5);
+				//alert(markerLat); alert(markerLng);
 				var newmappoint = new google.maps.LatLng(markerLat, markerLng);
-        		var marker = new google.maps.Marker({
+        		var randMarker = new google.maps.Marker({
 		            position:newmappoint,
-		            map: map,
+		            map: map
         		});
-        		alert(2);
+        		markers.push(randMarker);
+			};
 
+			for (var j = 0; j < 5; j++) {
+				markerLat = getRandomArbitrary(e.overlay.getPosition().lat(), e.overlay.getPosition().lat()-1.5);
+				markerLng = getRandomArbitrary(e.overlay.getPosition().lng(), e.overlay.getPosition().lng()-1.5);
+				var newmappoint = new google.maps.LatLng(markerLat, markerLng);
+        		var randMarker = new google.maps.Marker({
+		            position:newmappoint,
+		            map: map
+        		});
+        		markers.push(randMarker);
 			};
       }
     
