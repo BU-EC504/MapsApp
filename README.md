@@ -9,3 +9,8 @@ In the MapsApp project we’ll have to build an interactive application that dis
 ----web
 ------WEB-INF: Folder contains jsp files
 
+#Navigation
+1. url/map - returns the map.jsp page, which displays the map.
+2. url/nearby?x={float}&y={float} - returns the 10 closest points to the location(x,y), where x - latitude and y - longitude, in JSON format.
+3. url/area?x1={float}&y1={float}&x2={float}&y2={float}&x3={float}&y3={float}&x4={float}&y4={float} - returns the points bounded by (x1,y1),(x2,y2),(x3,y3),(x4,y4) in JSON format.
+
