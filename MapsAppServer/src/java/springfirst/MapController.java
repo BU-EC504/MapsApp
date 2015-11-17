@@ -53,8 +53,8 @@ public class MapController {
         int y;
         for (int i = 0; i < 10; i++)
         {
-            x = rnd.nextInt((int)x2 - (int)x1);
-            y = rnd.nextInt((int)y2 - (int)y1);
+            x = rnd.nextInt(Math.abs((int)x2 - (int)x1));
+            y = rnd.nextInt(Math.abs((int)y2 - (int)y1));
             points.add(new Location("Test", x1+x, y1+y));
         }
         
