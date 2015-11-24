@@ -26,5 +26,7 @@
     p:password="${jdbc.password}" /-->
 
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
-
+    <bean id="mapAppservice" class="springfirst.MapAppService">
+        <property name="prop" value="Testing"/>
+    </bean>
 </beans>

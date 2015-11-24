@@ -47,7 +47,7 @@ public class MapController {
     public Vector<Location> area(@RequestParam(value="x1") float x1, @RequestParam(value="y1") float y1,
             @RequestParam(value="x2") float x2, @RequestParam(value="y2") float y2)
     {
-        Vector<Location> points = new Vector<Location>();
+        /*Vector<Location> points = new Vector<Location>();
         Random rnd = new Random();
         int x;
         int y;
@@ -56,8 +56,14 @@ public class MapController {
             x = rnd.nextInt((int)x2 - (int)x1);
             y = rnd.nextInt((int)y2 - (int)y1);
             points.add(new Location("Test", x1+x, y1+y));
-        }
+        }*/
         
-        return points;
+        return MapAppService.locations;
+    }
+    
+    @RequestMapping("/testing")
+    @ResponseBody
+    public String test(){
+        return MapAppService.prop;
     }
 }
