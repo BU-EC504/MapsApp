@@ -160,29 +160,31 @@ function initMap() {
                     // Guess 100 random points inside the bounds, 
                     // put a marker at the first one contained by the polygon and break out of the loop
                     //alert("http://localhost:8080/MapsAppServer/area?x1="+SELat+"&y1="+SELng+"&x2="+NWLat+"&y2="+NWLng);
-                    $.get("http://localhost:8080/MapsAppServer/area?x1="+SELat+"&y1="+SELng+"&x2="+NWLat+"&y2="+NWLng,function(data,status){
+                    $.get("http://localhost:8080/MapsAppServer/area?x1="+NWLat+"&y1="+NWLng+"&x2="+SELat+"&y2="+SELng,function(data,status){
                         refPoints = data;
                         //alert("Data "+data+ "\n Status:"+status);
                     });
                     alert("here2");
-                    //alert(Object.keys(refPoints).length);
+                    alert(Object.keys(refPoints).length);
                     
                     //var randomMarkers =Math.floor(Math.random() * 30) + 5 ;
                     for (var i = 0; i < Object.keys(refPoints).length; i++) 
                     {
                         //var ptLat = Math.random() * (NE.lat() - SW.lat()) + SW.lat();
 			//var ptLng = Math.random() * (NE.lng() - SW.lng()) + SW.lng();
-                        
+                        //alert("here3");
+                        //we need to fix the way were sending the data from server before
+                        var pLng = refPoints[i].longitude  ;
                         var pLat = refPoints[i].latitude;
-                        var pLng = refPoints[i].longitude;
-                        alert(pLat+","+pLng+" : "+ i);
+                        var pName = refPoints[i].name;
+                        //alert(pLat+","+pLng+" : "+ i);
 			var point = new google.maps.LatLng(pLat,pLng);
                         
-			var marker2 = new google.maps.Marker({position:point, map:map});
+			var marker2 = new google.maps.Marker({position:point, map:map, customInfo: pName});
                         
 			google.maps.event.addListener(marker2, 'mouseover', function() {
                             this.info = new google.maps.InfoWindow({
-				content: this.getPosition().lat()+","+this.getPosition().lng(),
+				content: this.customInfo,
 				map: map
                             });
                             this.info.open(map, this);
@@ -264,7 +266,7 @@ function initMap() {
                     var markerLat;
                     var markerLng;
                     var refPoints;
-
+                    alert("http://localhost:8080/MapsAppServer/nearby?x="+e.overlay.getPosition().lat()+"&y="+e.overlay.getPosition().lng());
                     $.get("http://localhost:8080/MapsAppServer/nearby?x="+e.overlay.getPosition().lat()+"&y="+e.overlay.getPosition().lng(),function(data,status){
                         refPoints = data;
                         //alert("Data "+data+ "\n Status:"+status);
