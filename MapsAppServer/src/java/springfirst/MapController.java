@@ -69,14 +69,18 @@ public class MapController {
     {
         Vector<Location> points = new Vector<Location>();
         
-        LocationTree ltree =(LocationTree)context.getAttribute("locationTree");
+        //LocationTree ltree =(LocationTree)context.getAttribute("locationTree");
+        
         //x2 is NWLat and y2 is NWlng ->needed for search
         //calculate rect dimensions here
+        y2 += 360;
+        y1 += 360;
         float width = Math.abs(x2-x1);
         float height = Math.abs(y2-y1);
         float[] dimensions = new float[]{width,height};
-        float[] coords = new float[]{x2,y2};
-        ArrayList<String> data = ltree.findArea(coords,dimensions);
+        float[] coords = new float[]{x1,y1};
+        ArrayList<String> data = LocationTree.findArea(coords,dimensions);
+        
         for(int i=0;i<data.size();i++)
         {
             //parse each string
@@ -84,16 +88,6 @@ public class MapController {
             points.add(new Location(data.get(i), Float.parseFloat(str[str.length-2]), Float.parseFloat(str[str.length-1])));
         }
 
-/*        Random rnd = new Random();
-        int x;
-        int y;
-        for (int i = 0; i < 10; i++)
-        {
-            x = rnd.nextInt(Math.abs((int)x2 - (int)x1));
-            y = rnd.nextInt(Math.abs((int)y2 - (int)y1));
-            points.add(new Location("Test", x1+x, y1+y));
-        }*/
-        
         return points;
     }
 }

@@ -711,7 +711,9 @@ public class RTree<T>
   private boolean isOverlap(float[] scoords, float[] sdimensions,
       float[] coords, float[] dimensions)
   {
-    final float FUDGE_FACTOR=1.001f;
+    //final float FUDGE_FACTOR=1.001f;
+    final float FUDGE_FACTOR=1.0f;
+    
     for (int i = 0; i < scoords.length; i++)
     {
       boolean overlapInThisDimension = false;

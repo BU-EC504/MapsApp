@@ -25,7 +25,7 @@ public class LocationTree {
     public LocationTree()
     {
         
-         tree = new RTree<Integer>(50,1,2);
+         tree = new RTree<Integer>(50,25,2);
          data = new ArrayList<String>();
          System.out.println("location tree initialised");
         //tree = RTree.star().maxChildren(6).create();
@@ -48,7 +48,7 @@ public class LocationTree {
     public static void loadTree() throws FileNotFoundException, IOException
     {
         //first read file contents and insert to tree element by element
-        String file = "C://Users/Dana/Downloads/NationalFile";
+        String file = "/Users/haydarkarrar/Desktop/NationalFile.txt";
         //Create object of FileReader
         FileReader inputFile = new FileReader(file);
         //Instantiate the BufferedReader Class
@@ -56,7 +56,7 @@ public class LocationTree {
         //Variable to hold the one line data
         String line;
         int count = 0;
-        data.add(""); //for now always ignore 0
+        
         while ((line = bufferReader.readLine()) != null)
         {
             //create an item for this line
@@ -67,12 +67,13 @@ public class LocationTree {
                //Item item = new Item(str[0],str[1]);
                 if(str.length>1)
                 {
-                    float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Float.parseFloat(str[str.length-1])};//there are issues with the file that we can deal with later
+                    float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Float.parseFloat(str[str.length-1]) + 360};
+                    //there are issues with the file that we can deal with later
                     String refName = str[0]+" "+str[1];
                     //tree = tree.add(Entry.entry(item, Geometries.point(Double.parseDouble(str[2]),Double.parseDouble(str[3]))));
                     try
                     {
-                        tree.insert(coords, count);  
+                        tree.insert(coords, count-1);  
                         data.add(line);
                     }
                     catch (Exception e)
@@ -83,10 +84,11 @@ public class LocationTree {
                 
                 
             }
-            System.out.println(count+" items inserted to the tree");
+            System.out.println(count+" items");
             count++;
             
         }
+        
         System.out.println(count+" final items inserted to the tree");
         //Close the buffer reader
         bufferReader.close();
