@@ -73,12 +73,14 @@ public class MapController {
         
         //x2 is NWLat and y2 is NWlng ->needed for search
         //calculate rect dimensions here
-        y2 += 360;
-        y1 += 360;
+        
         float width = Math.abs(x2-x1);
         float height = Math.abs(y2-y1);
+        y1 = Math.abs(y1);
+        
         float[] dimensions = new float[]{width,height};
         float[] coords = new float[]{x1,y1};
+        
         ArrayList<String> data = LocationTree.findArea(coords,dimensions);
         
         for(int i=0;i<data.size();i++)

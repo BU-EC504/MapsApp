@@ -19,13 +19,13 @@ import java.util.List;
  */
 public class LocationTree {
     //public static RTree<String, Geometry> tree= RTree.star().maxChildren(6).create();
-    public static RTree<Integer> tree;
+    public static RTree<String> tree;
     public static ArrayList<String> data; 
     //constructor
     public LocationTree()
     {
         
-         tree = new RTree<Integer>(50,25,2);
+         tree = new RTree<String>(50,25,2);
          data = new ArrayList<String>();
          System.out.println("location tree initialised");
         //tree = RTree.star().maxChildren(6).create();
@@ -67,14 +67,14 @@ public class LocationTree {
                //Item item = new Item(str[0],str[1]);
                 if(str.length>1)
                 {
-                    float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Float.parseFloat(str[str.length-1]) + 360};
+                    float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Math.abs(Float.parseFloat(str[str.length-1]))};
                     //there are issues with the file that we can deal with later
                     String refName = str[0]+" "+str[1];
                     //tree = tree.add(Entry.entry(item, Geometries.point(Double.parseDouble(str[2]),Double.parseDouble(str[3]))));
                     try
                     {
-                        tree.insert(coords, count-1);  
-                        data.add(line);
+                        tree.insert(coords, line);  
+                        //data.add(line);
                     }
                     catch (Exception e)
                     {
@@ -98,12 +98,9 @@ public class LocationTree {
     public static ArrayList<String> findArea(float[] coords, float[] dimensions)
     {
         //the data arraylist has the whole line which needs to be parsed again
-        List<Integer> indexes = tree.search(coords, dimensions);
+        List<String> indexes = tree.search(coords, dimensions);
         ArrayList<String> temp= new ArrayList<String>();
-        for(int i=0; i<indexes.size();i++)
-        {
-            temp.add(data.get(indexes.get(i)));
-        }
+        temp.addAll(indexes);
         return temp;
     }
 }
