@@ -45,11 +45,11 @@ public class MapController {
     public ArrayList<Location> nearby(@RequestParam(value="x") float x, @RequestParam(value="y") float y)
     {
         
-        y = Math.abs(y) - _longitudeAdjust;
-        x = x - _latitudeAdjust;
+        float y2 = Math.abs(y) - _longitudeAdjust;
+        float x2 = x - _latitudeAdjust;
         
         float[] dimensions = new float[]{_latitudeSquare,_longitudeSquare};
-        float[] coords = new float[]{x,y};
+        float[] coords = new float[]{x2,y2};
         
         ArrayList<Location> data = LocationTree.findArea(coords,dimensions);
         

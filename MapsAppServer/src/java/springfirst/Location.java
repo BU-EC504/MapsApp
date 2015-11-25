@@ -29,8 +29,10 @@ public class Location implements Comparable<Location>{
     public void setDistance(double _lat, double _long){
         
         double x = Math.cos((Math.toRadians(this.latitude)+Math.toRadians(_lat))/2.0d);
-        x = x * (Math.toRadians(this.longitude) - Math.toRadians(_long));
-        double y = Math.toRadians(this.latitude) - Math.toRadians(_lat);
+        x = x * Math.toRadians(this.longitude - _long);
+        
+        double y = Math.toRadians(this.latitude - _lat);
+        
         this.distance = Math.sqrt(y*y + x*x) * 6371;
         
     }
