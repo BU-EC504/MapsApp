@@ -95,12 +95,29 @@ public class LocationTree {
         
     }
     
-    public static ArrayList<String> findArea(float[] coords, float[] dimensions)
+    public static ArrayList<Location> findArea(float[] coords, float[] dimensions)
     {
         //the data arraylist has the whole line which needs to be parsed again
         List<String> indexes = tree.search(coords, dimensions);
-        ArrayList<String> temp= new ArrayList<String>();
-        temp.addAll(indexes);
+        
+        ArrayList<Location> temp= new ArrayList<Location>();
+        
+        for(String str : indexes){
+            Location loc = parseLocation(str);
+            temp.add(loc);
+        }
+        
         return temp;
     }
+    
+    private static Location parseLocation(String str){
+        
+        String[] strArr = str.split("\\s+");
+        
+        double latitude = Double.parseDouble(strArr[strArr.length-2]);
+        double longitude = Double.parseDouble(strArr[strArr.length-1]);
+        
+        return new Location(str, latitude, longitude);
+    }
+    
 }

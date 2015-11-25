@@ -12,15 +12,28 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author haydarkarrar
  */
-public class Location {
+public class Location implements Comparable<Location>{
 
-    public Location(String name, double longitude, double latitude) {
+    public Location(String name, double latitude, double longitude) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
     }
     
+    private double distance = Double.MAX_VALUE;
     
+    public double getDistance(){
+        return this.distance;
+    }
+    
+    public void setDistance(double _lat, double _long){
+        
+        double x = Math.cos((Math.toRadians(this.latitude)+Math.toRadians(_lat))/2.0d);
+        x = x * (Math.toRadians(this.longitude) - Math.toRadians(_long));
+        double y = Math.toRadians(this.latitude) - Math.toRadians(_lat);
+        this.distance = Math.sqrt(y*y + x*x) * 6371;
+        
+    }
     
     private String name;
 
@@ -81,6 +94,20 @@ public class Location {
      */
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public int compareTo(Location loc) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+        
+        if (this == loc) return EQUAL;
+        
+        if(this.distance <= loc.getDistance()) 
+            return BEFORE;
+        else 
+            return AFTER;
     }
 
 }
