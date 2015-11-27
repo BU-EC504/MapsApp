@@ -30,6 +30,35 @@
 		border-color: green;
 		margin-left:30px;		
       }
+      .gm-style-iw {   
+            background-color: #fff;    
+            border: 1px solid rgba(72, 181, 233, 0.6);
+            border-radius: 2px 2px 10px 10px;
+        }
+        #iw-container {
+            
+        }
+        #iw-container .iw-title {
+            font-family: 'Open Sans Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 400;
+            padding: 10px;
+            color: #48b5e9;
+
+            margin: 0;
+            margin-right: 0px;
+            border-radius: 2px 2px 0 0;
+        }
+        #iw-container .iw-content {
+            font-size: 13px;
+            line-height: 18px;
+            font-weight: 400;
+            margin-right: 1px;
+            padding: 15px 5px 20px 15px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
     </style>
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
@@ -67,12 +96,16 @@
 	<br/>
 	<br />
     <script>
-	var map;
+
+var map;
 	
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: new google.maps.LatLng(42.349457,-71.100739),
-        zoom: 4
+        zoom: 4,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        disableDefaultUI:true,
+        zoomControl:true
     });
   
     //code from http://www.devx.com/webdev/advanced-google-maps-functionality-tutorial.html
@@ -100,16 +133,26 @@ function initMap() {
   
     var selectedShape;
 
+    var circle;
     function clearShape(){
         if (selectedShape){
-            selectedShape.setEditable(false);
+            //alert(selectedShape);
+            //selectedShape.setEditable(false);            
             selectedShape.setMap(null);
             selectedShape = null;
             while(markers.length){
                 markers.pop().setMap(null);
             }
+           //selectedShape.setDraw(null);
+           map.setZoom(4);
         }
+        if(circle)
+        {
+            circle.setMap(null);
+        }
+        //map.setZoom(4);
     }
+    
 
     function setSelection(shape) {
         clearShape();
@@ -154,37 +197,54 @@ function initMap() {
                     map.panTo(NE);
                     map.setZoom(6);
                     var refPoints;
-                    
-                  //  alert("http://localhost:8080/MapsAppServer/area?x1="+SELat+"&y1="+SELng+"&x2="+NWLat+"&y2="+NWLng);
-                   
-                    // Guess 100 random points inside the bounds, 
+                     
                     // put a marker at the first one contained by the polygon and break out of the loop
-                    //alert("http://localhost:8080/MapsAppServer/area?x1="+SELat+"&y1="+SELng+"&x2="+NWLat+"&y2="+NWLng);
                     $.get("http://localhost:8080/MapsAppServer/area?x1="+NWLat+"&y1="+NWLng+"&x2="+SELat+"&y2="+SELng,function(data,status){
                         refPoints = data;
                         //alert("Data "+data+ "\n Status:"+status);
                     });
-                    alert("here2");
-                    alert(Object.keys(refPoints).length);
-                    
+                    //alert("here2");
+                    setTimeout(function(){
+                        var noRefPoints = '<div id="iw-container">' +                                 
+                                 '<div class="iw-title" style="font-size:18px"><b>' +                         
+                                 'Number of reference points found<br></b> </div>' +
+                                 '<div class="iw-content"><b>'+Object.keys(refPoints).length+'</b></div>' +
+                                 '</div></div>';
+                    //alert(noRefPoints);
+                    //var infoPosition = new google.maps.LatLng(pLat,pLng);
+                    var tempInfo = new google.maps.InfoWindow({
+				content: noRefPoints,
+                                position: NE,
+                                pixelOffset:50,
+				map: map
+                            });
+                            
+                    tempInfo.open(map);
+                    setTimeout(function(){tempInfo.close()},6000);
                     //var randomMarkers =Math.floor(Math.random() * 30) + 5 ;
                     for (var i = 0; i < Object.keys(refPoints).length; i++) 
                     {
-                        //var ptLat = Math.random() * (NE.lat() - SW.lat()) + SW.lat();
-			//var ptLng = Math.random() * (NE.lng() - SW.lng()) + SW.lng();
-                        //alert("here3");
+                       
                         //we need to fix the way were sending the data from server before
-                        var pLng = refPoints[i].longitude  ;
-                        var pLat = refPoints[i].latitude;
-                        var pName = refPoints[i].name;
-                        //alert(pLat+","+pLng+" : "+ i);
+                        var pLng = refPoints[i].longitude;
+                        var pLat =  refPoints[i].latitude;
+                        var pState=refPoints[i].state;
+                        var pProvince = refPoints[i].province;
+                       // alert(pLat+","+pLng+" : "+ i);
 			var point = new google.maps.LatLng(pLat,pLng);
+                        var test= '<div id="iw-container">' +
+                                 '<div class="iw-title">'+pState+', '+pProvince+'</div>' +
+                                 '<div class="iw-content">' +                         
+                                 '<p>Latitude: '+pLat+'<br/>Longitude: '+pLng+'</p>' +
+                                 '</div></div>';
                         
-			var marker2 = new google.maps.Marker({position:point, map:map, customInfo: pName});
+                        
+                        
+			var marker2 = new google.maps.Marker({position:point, map:map, customInfo: test});
                         
 			google.maps.event.addListener(marker2, 'mouseover', function() {
                             this.info = new google.maps.InfoWindow({
-				content: this.customInfo,
+				content: this.customInfo,                          
 				map: map
                             });
                             this.info.open(map, this);
@@ -197,11 +257,15 @@ function initMap() {
                         
 			markers.push(marker2);
                         //alert(markers);
-                        //alert("hello");	 
+                        //alert("hello");
+                        
+                        
                     }
-		}
-		 
-    
+                    //alert("hello")
+                    },700);
+                    map.fitBounds(bounds);
+		}		 
+               
                 //reset drawing mode after drawing a shape.
                 drawingManagerRectangle.setDrawingMode(null);
 
@@ -215,6 +279,7 @@ function initMap() {
             //Delete the current shape when the drawing mode is changed, or when the map is clicked.
             google.maps.event.addListener(drawingManagerRectangle, 'drawingmode_changed', clearShape);
             google.maps.event.addListener(map, 'click', clearShape);
+            //google.maps.event.addListener(map, 'click', clearShape);
 	}
 	else
 	{
@@ -240,6 +305,7 @@ function initMap() {
 		}*/
 
             });
+            
             google.maps.event.addListener(drawingManagerMarker, 'overlaycomplete', function(e) 
             {
                 if (e.type == google.maps.drawing.OverlayType.MARKER) 
@@ -248,43 +314,61 @@ function initMap() {
                     map.setZoom(7);
                     e.overlay.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');			
                     var infowindow = new google.maps.InfoWindow({
-                        content: '<p>Location:' + e.overlay.getPosition() + '</p>'
+                        content: '<div id="iw-container">' +
+                                 '<div class="iw-title" style="font-size:18px;">You are looking for reference points near</div>' +
+                                 '<div class="iw-content"  >' +                         
+                                 '<p>'+'<b>Latitude: </b>'+e.overlay.getPosition().lat()+'<br/><br><b>Longitude: </b>'+e.overlay.getPosition().lng()+'</p>' +
+                                 '</div></div>',
+                        pixelOffset: 10
                     });
                     infowindow.open(map,e.overlay);
-                    var circle = new google.maps.Circle({
-                        radius: 250*1000, 
-                        center: e.overlay,
-                        map: map,
-                        fillColor: '#FF0000',
-                        fillOpacity: 0.2,
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.6
-                    }); 
-			
-                    circle.bindTo('center',e.overlay,'position');
+                    setTimeout(function(){ infowindow.close();},6000);
 
                     var markerLat;
                     var markerLng;
                     var refPoints;
-                    alert("http://localhost:8080/MapsAppServer/nearby?x="+e.overlay.getPosition().lat()+"&y="+e.overlay.getPosition().lng());
+                    
+                    //alert("http://localhost:8080/MapsAppServer/nearby?x="+e.overlay.getPosition().lat()+"&y="+e.overlay.getPosition().lng());
                     $.get("http://localhost:8080/MapsAppServer/nearby?x="+e.overlay.getPosition().lat()+"&y="+e.overlay.getPosition().lng(),function(data,status){
                         refPoints = data;
-                        //alert("Data "+data+ "\n Status:"+status);
+                        //alert("Data "+refPoints+ "\n Status:"+status);
                     });
-                    alert(Object.keys(refPoints).length);
-                    for(var j=0; j<Object.keys(refPoints).length;j++)
+                    //alert("here"); //ok so this is weird/inexplicable, if I remove this alert... doesnt work,..
+                    //alert(Object.keys(refPoints).length);
+                    
+                    setTimeout(function(){
+                    var maxDistance=0;
+                    var maxLat;
+                    var maxLng;
+                    for(var j=0; j<10;j++)
                     {                       
                         markerLat = refPoints[j].latitude;
                         markerLng = refPoints[j].longitude;
+                        var markerState=refPoints[j].state;
+                        var markerProvince=refPoints[j].province;
+                        var markerDistance = refPoints[j].distance;
+                        
+                        if(markerDistance>maxDistance)
+                        {
+                            maxDistance = markerDistance;
+                            maxLat=markerLat;
+                            maxLng=markerLng;
+                        }
                         var newmappoint = new google.maps.LatLng(markerLat, markerLng);
+                        var test= '<div id="iw-container">' +
+                                 '<div class="iw-title">'+markerState+', '+markerProvince+'</div>' +
+                                 '<div class="iw-content">' +                         
+                                 '<p>Distance: '+markerDistance+' km<br/>'+'Latitude: '+markerLat+'<br/>Longitude: '+markerLng+'</p>' +
+                                 '</div></div>';
                         var randMarker = new google.maps.Marker({
                             position:newmappoint,
-                            map: map
+                            map: map,
+                            customInfo: test
                         });
                        
                         google.maps.event.addListener(randMarker, 'mouseover', function() {	
 			this.info = new google.maps.InfoWindow({
-                            content: this.getPosition().lat()+","+this.getPosition().lng(),
+                            content: this.customInfo,
                             map: map
 			});
 							
@@ -293,27 +377,43 @@ function initMap() {
 				
                         google.maps.event.addListener(randMarker, 'mouseout', function() {
 			this.info.close();
-                        });
-                        				
+                        });                        				
 					
-                        markers.push(randMarker);                   
+                        markers.push(randMarker); 
+                        
                     };  
-                }
-    
+                    
+                    //alert("Final: " + maxDistance);
+                    //converting to meters
+                    circle = new google.maps.Circle({
+                        radius: maxDistance *1000, 
+                        center: e.overlay,
+                        map: map,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.2,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.6
+                    }); 
 
+                    circle.bindTo('center',e.overlay,'position');
+                    map.fitBounds(circle.getBounds());
+                    
+                    },700);
+                }    
+        
                 //reset drawing mode after drawing a shape.
                 drawingManagerMarker.setDrawingMode(null);
 
                 var newShape = e.overlay;
                 newShape.type = e.type;
                 setSelection(newShape);
-                //clearShape;
             });
 
-            drawingManagerMarker.setMap(map);
+            drawingManagerMarker.setMap(map);            
             //Delete the current shape when the drawing mode is changed, or when the map is clicked.
             google.maps.event.addListener(drawingManagerMarker, 'drawingmode_changed', clearShape);
             google.maps.event.addListener(map, 'click', clearShape);
+           // google.maps.event.addListener(map, 'click', circle.setMap(null));
 	}
     
     }

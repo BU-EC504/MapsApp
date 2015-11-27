@@ -48,7 +48,7 @@ public class LocationTree {
     public static void loadTree() throws FileNotFoundException, IOException
     {
         //first read file contents and insert to tree element by element
-        String file = "/Users/haydarkarrar/Desktop/NationalFile.txt";
+        String file = "C://Users/Dana/Downloads/NationalFile";
         //Create object of FileReader
         FileReader inputFile = new FileReader(file);
         //Instantiate the BufferedReader Class
@@ -95,12 +95,37 @@ public class LocationTree {
         
     }
     
-    public static ArrayList<String> findArea(float[] coords, float[] dimensions)
+    public static ArrayList<Location> findArea(float[] coords, float[] dimensions)
     {
         //the data arraylist has the whole line which needs to be parsed again
         List<String> indexes = tree.search(coords, dimensions);
-        ArrayList<String> temp= new ArrayList<String>();
-        temp.addAll(indexes);
+        
+        ArrayList<Location> temp= new ArrayList<Location>();
+        
+        for(String str : indexes){
+            Location loc = parseLocation(str);
+            temp.add(loc);
+        }
+        
         return temp;
     }
+    
+    private static Location parseLocation(String str){
+        
+        String[] strArr = str.split("\\s+");
+        
+        double latitude = Double.parseDouble(strArr[strArr.length-2]);
+        double longitude = Double.parseDouble(strArr[strArr.length-1]);
+        
+        String state,province;
+        state=strArr[0];
+        province="";
+        for(int i=1;i<strArr.length-2;i++)
+        {
+            province=province+" "+strArr[i];
+        }
+        
+        return new Location(state,province, latitude, longitude);
+    }
+    
 }

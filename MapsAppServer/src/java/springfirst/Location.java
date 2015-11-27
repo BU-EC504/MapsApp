@@ -12,36 +12,72 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author haydarkarrar
  */
-public class Location {
+public class Location implements Comparable<Location>{
 
-    public Location(String name, double longitude, double latitude) {
-        this.name = name;
+    public Location(String state,String province, double latitude, double longitude) {
+        this.state = state;
+        this.province = province;
         this.longitude = longitude;
         this.latitude = latitude;
     }
     
+    private double distance = Double.MAX_VALUE;
     
+    public double getDistance(){
+        return this.distance;
+    }
     
-    private String name;
+    public void setDistance(double _lat, double _long){
+        
+        double x = Math.cos((Math.toRadians(this.latitude)+Math.toRadians(_lat))/2.0d);
+        x = x * Math.toRadians(this.longitude - _long);
+        
+        double y = Math.toRadians(this.latitude - _lat);
+        
+        this.distance = Math.sqrt(y*y + x*x) * 6371;
+        
+    }
+    
+    private String state;
+    
 
     /**
-     * Get the value of name
+     * Get the value of state
      *
-     * @return the value of name
+     * @return the value of state
      */
-    public String getName() {
-        return name;
+    public String getState() {
+        return state;
     }
 
     /**
-     * Set the value of name
+     * Set the value of state
      *
-     * @param name new value of name
+     * @param state new value of state
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setState(String state) {
+        this.state = state;
     }
 
+    
+    private String province;
+        /**
+     * Get the value of province
+     *
+     * @return the value of province
+     */
+    public String getProvince() {
+        return province;
+    }
+
+    /**
+     * Set the value of province
+     *
+     * @param province new value of province
+     */
+    public void setProvince(String province) {
+        this.province = province;
+    }
     
     private double longitude;
 
@@ -81,6 +117,20 @@ public class Location {
      */
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public int compareTo(Location loc) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+        
+        if (this == loc) return EQUAL;
+        
+        if(this.distance <= loc.getDistance()) 
+            return BEFORE;
+        else 
+            return AFTER;
     }
 
 }
