@@ -11,7 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import springfirst.RTree.SeedPicker;
 
 /**
  *
@@ -19,14 +21,16 @@ import java.util.List;
  */
 public class LocationTree {
     //public static RTree<String, Geometry> tree= RTree.star().maxChildren(6).create();
-    public static RTree<String> tree;
-    public static ArrayList<String> data; 
+    public static RTree<Integer> tree;
+    public static HashMap<String, Integer> proviceHash;
+    public static HashMap<Integer, String> reverseProviceHash;
     //constructor
     public LocationTree()
     {
-        
-         tree = new RTree<String>(50,25,2);
-         data = new ArrayList<String>();
+         proviceHash = new HashMap<String, Integer>();
+         reverseProviceHash = new HashMap<Integer, String>();
+         
+         tree = new RTree<Integer>(100,50,2, SeedPicker.LINEAR);
          System.out.println("location tree initialised");
         //tree = RTree.star().maxChildren(6).create();
          try
@@ -54,42 +58,43 @@ public class LocationTree {
         //Instantiate the BufferedReader Class
         BufferedReader bufferReader = new BufferedReader(inputFile);
         //Variable to hold the one line data
-        String line;
+        String line = bufferReader.readLine();
         int count = 0;
         
+        long start = System.currentTimeMillis();
         while ((line = bufferReader.readLine()) != null)
         {
             //create an item for this line
-            String[] str = line.split("\\s+");//saved as tabbed variables in the text file
-            //0 is state, 1 is province, 2 is lat and 3 is long
-            if(count!=0)//first item is the table heading
+            String[] str = line.split("\\s+");
+            if(str.length>1)
             {
-               //Item item = new Item(str[0],str[1]);
-                if(str.length>1)
+                float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Math.abs(Float.parseFloat(str[str.length-1]))};
+                //there are issues with the file that we can deal with later
+                String refName = str[0]+" "+str[1];
+                //tree = tree.add(Entry.entry(item, Geometries.point(Double.parseDouble(str[2]),Double.parseDouble(str[3]))));
+                try
                 {
-                    float[] coords = new float[]{Float.parseFloat(str[str.length-2]),Math.abs(Float.parseFloat(str[str.length-1]))};
-                    //there are issues with the file that we can deal with later
-                    String refName = str[0]+" "+str[1];
-                    //tree = tree.add(Entry.entry(item, Geometries.point(Double.parseDouble(str[2]),Double.parseDouble(str[3]))));
-                    try
-                    {
-                        tree.insert(coords, line);  
-                        //data.add(line);
+                    if(proviceHash.containsKey(refName)){
+                        tree.insert(coords, proviceHash.get(refName));
                     }
-                    catch (Exception e)
-                    {
-                        System.out.println(e.getMessage());
+                    else{
+                        proviceHash.put(refName, count);
+                        reverseProviceHash.put(count, refName);
+                        tree.insert(coords, proviceHash.get(refName));
                     }
                 }
-                
-                
+                catch (Exception e)
+                {
+                    System.out.println(e.getMessage());
+                    break;
+                }
+                System.out.println(count);
+                count++;
             }
-            System.out.println(count+" items");
-            count++;
-            
         }
-        
-        System.out.println(count+" final items inserted to the tree");
+        long elapsed = System.currentTimeMillis() - start;
+        System.out.println("Time spend:" + elapsed/1000);
+        System.out.println(count + " final items inserted to the tree");
         //Close the buffer reader
         bufferReader.close();
         
@@ -98,26 +103,29 @@ public class LocationTree {
     public static ArrayList<Location> findArea(float[] coords, float[] dimensions)
     {
         //the data arraylist has the whole line which needs to be parsed again
-        List<String> indexes = tree.search(coords, dimensions);
+        ArrayList<Location> result = tree.search(coords, dimensions);
         
-        ArrayList<Location> temp= new ArrayList<Location>();
         
-        for(String str : indexes){
-            Location loc = parseLocation(str);
-            temp.add(loc);
-        }
         
-        return temp;
+        return result;
     }
     
     private static Location parseLocation(String str){
         
         String[] strArr = str.split("\\s+");
         
-        double latitude = Double.parseDouble(strArr[strArr.length-2]);
-        double longitude = Double.parseDouble(strArr[strArr.length-1]);
+        float latitude = Float.parseFloat(strArr[strArr.length-2]);
+        float longitude = Float.parseFloat(strArr[strArr.length-1]);
         
-        return new Location(str, latitude, longitude);
+        String state,province;
+        state=strArr[0];
+        province="";
+        for(int i=1;i<strArr.length-2;i++)
+        {
+            province=province+" "+strArr[i];
+        }
+        
+        return new Location(state, province, latitude, longitude);
     }
     
 }

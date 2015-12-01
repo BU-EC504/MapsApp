@@ -10,6 +10,7 @@ package springfirst;
  * @author Dana
  */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -136,17 +137,17 @@ public class RTree<T>
    * @return a list of objects whose rectangles overlap with the given
    *         rectangle.
    */
-  public List<T> search(float[] coords, float[] dimensions)
+  public ArrayList<Location> search(float[] coords, float[] dimensions)
   {
     assert (coords.length == numDims);
     assert (dimensions.length == numDims);
-    LinkedList<T> results = new LinkedList<T>();
+    ArrayList<Location> results = new ArrayList<Location>();
     search(coords, dimensions, root, results);
     return results;
   }
 
   private void search(float[] coords, float[] dimensions, Node n,
-      LinkedList<T> results)
+      ArrayList<Location> results)
   {
     if (n.leaf)
     {
@@ -154,7 +155,11 @@ public class RTree<T>
       {
         if (isOverlap(coords, dimensions, e.coords, e.dimensions))
         {
-          results.add(((Entry) e).entry);
+            String str = LocationTree.reverseProviceHash.get(((Entry)e).entry);
+            String[] strArr = str.split(" ");
+            Location loc = new Location(strArr[0],strArr[1], e.coords[0], -1*e.coords[1]);
+            loc.setDistance(coords[0], -1*coords[1]);
+            results.add(loc);
         }
       }
     }
@@ -194,7 +199,7 @@ public class RTree<T>
     assert (l != null) : "Could not find leaf for entry to delete";
     assert (l.leaf) : "Entry is not found at leaf?!?";
     ListIterator<Node> li = l.children.listIterator();
-    T removed = null;
+    Integer removed = null;
     while (li.hasNext())
     {
       @SuppressWarnings("unchecked")
@@ -330,7 +335,7 @@ public class RTree<T>
    * @param entry
    *          the entry to insert
    */
-  public void insert(float[] coords, float[] dimensions, T entry)
+  public void insert(float[] coords, float[] dimensions, Integer entry)
   {
     assert (coords.length == numDims);
     assert (dimensions.length == numDims);
@@ -355,7 +360,7 @@ public class RTree<T>
    * @param coords
    * @param entry
    */
-  public void insert(float[] coords, T entry)
+  public void insert(float[] coords, Integer entry)
   {
     insert(coords, pointDims, entry);
   }
@@ -766,9 +771,9 @@ public class RTree<T>
 
   private class Entry extends Node
   {
-    final T entry;
+    final Integer entry;
 
-    public Entry(float[] coords, float[] dimensions, T entry)
+    public Entry(float[] coords, float[] dimensions, Integer entry)
     {
       // an entry isn't actually a leaf (its parent is a leaf)
       // but all the algorithms should stop at the first leaf they encounter,
