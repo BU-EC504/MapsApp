@@ -275,7 +275,7 @@ public class RTree<T>
     }
     LinkedList<Node> cc = new LinkedList<Node>(n.children);
     n.children.clear();
-    Node[] ss = lPickSeeds(cc);
+    Node[] ss = pickSeeds(cc);
     nn[0].children.add(ss[0]);
     nn[1].children.add(ss[1]);
     tighten(nn);
@@ -297,7 +297,7 @@ public class RTree<T>
         tighten(nn); // Not sure this is required.
         return nn;
       }
-      Node c = lPickNext(cc);
+      Node c = pickNext(cc);
       Node preferred;
       float e0 = getRequiredExpansion(nn[0].coords, nn[0].dimensions, c);
       float e1 = getRequiredExpansion(nn[1].coords, nn[1].dimensions, c);
@@ -344,7 +344,7 @@ public class RTree<T>
   }
   
   // Implementation of LinearPickSeeds
-  private RTree<T>.Node[] lPickSeeds(LinkedList<Node> nn)
+  private RTree<T>.Node[] pickSeeds(LinkedList<Node> nn)
   {
     @SuppressWarnings("unchecked")
     RTree<T>.Node[] bestPair = new RTree.Node[2];
@@ -402,7 +402,7 @@ public class RTree<T>
    * Implementation of LinearPickNext
    * @param cc the children to be divided between the new nodes, one item will be removed from this list.
    */
-  private Node lPickNext(LinkedList<Node> cc)
+  private Node pickNext(LinkedList<Node> cc)
   {
     return cc.pop();
   }

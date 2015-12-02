@@ -20,7 +20,8 @@ import springfirst.RTree.SeedPicker;
  * @author Dana
  */
 public class MapService {
-    //public static RTree<String, Geometry> tree= RTree.star().maxChildren(6).create();
+    
+    public static String FILENAME = "/Users/haydarkarrar/Desktop/NationalFile.txt";
     public static RTree<Integer> tree;
     public static HashMap<String, Integer> proviceHash;
     public static HashMap<Integer, String> reverseProviceHash;
@@ -51,10 +52,9 @@ public class MapService {
     
     public static void loadTree() throws FileNotFoundException, IOException
     {
-        //first read file contents and insert to tree element by element
-        String file = "/Users/haydarkarrar/Desktop/NationalFile.txt";
+        
         //Create object of FileReader
-        FileReader inputFile = new FileReader(file);
+        FileReader inputFile = new FileReader(FILENAME);
         //Instantiate the BufferedReader Class
         BufferedReader bufferReader = new BufferedReader(inputFile);
         //Variable to hold the one line data
@@ -100,7 +100,7 @@ public class MapService {
         
     }
     
-    public static ArrayList<Location> findArea(float[] coords, float[] dimensions)
+    public static ArrayList<Location> search(float[] coords, float[] dimensions)
     {   
         return tree.search(coords, dimensions);
     }
