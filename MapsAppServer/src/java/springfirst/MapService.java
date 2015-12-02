@@ -19,13 +19,13 @@ import springfirst.RTree.SeedPicker;
  *
  * @author Dana
  */
-public class LocationTree {
+public class MapService {
     //public static RTree<String, Geometry> tree= RTree.star().maxChildren(6).create();
     public static RTree<Integer> tree;
     public static HashMap<String, Integer> proviceHash;
     public static HashMap<Integer, String> reverseProviceHash;
     //constructor
-    public LocationTree()
+    public MapService()
     {
          proviceHash = new HashMap<String, Integer>();
          reverseProviceHash = new HashMap<Integer, String>();
@@ -101,31 +101,9 @@ public class LocationTree {
     }
     
     public static ArrayList<Location> findArea(float[] coords, float[] dimensions)
-    {
-        //the data arraylist has the whole line which needs to be parsed again
-        ArrayList<Location> result = tree.search(coords, dimensions);
-        
-        
-        
-        return result;
+    {   
+        return tree.search(coords, dimensions);
     }
     
-    private static Location parseLocation(String str){
-        
-        String[] strArr = str.split("\\s+");
-        
-        float latitude = Float.parseFloat(strArr[strArr.length-2]);
-        float longitude = Float.parseFloat(strArr[strArr.length-1]);
-        
-        String state,province;
-        state=strArr[0];
-        province="";
-        for(int i=1;i<strArr.length-2;i++)
-        {
-            province=province+" "+strArr[i];
-        }
-        
-        return new Location(state, province, latitude, longitude);
-    }
     
 }

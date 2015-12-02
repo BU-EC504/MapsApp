@@ -155,7 +155,7 @@ public class RTree<T>
       {
         if (isOverlap(coords, dimensions, e.coords, e.dimensions))
         {
-            String str = LocationTree.reverseProviceHash.get(((Entry)e).entry);
+            String str = MapService.reverseProviceHash.get(((Entry)e).entry);
             String[] strArr = str.split(" ");
             Location loc = new Location(strArr[0],strArr[1], e.coords[0], -1*e.coords[1]);
             loc.setDistance(coords[0], -1*coords[1]);
@@ -175,144 +175,6 @@ public class RTree<T>
     }
   }
 
-  /**
-   * Deletes the entry associated with the given rectangle from the RTree
-   * 
-   * @param coords
-   *          the corner of the rectangle that is the lower bound in every
-   *          dimension
-   * @param dimensions
-   *          the dimensions of the rectangle
-   * @param entry
-   *          the entry to delete
-   * @return true iff the entry was deleted from the RTree.
-   */
-  public boolean delete(float[] coords, float[] dimensions, T entry)
-  {
-    assert (coords.length == numDims);
-    assert (dimensions.length == numDims);
-    Node l = findLeaf(root, coords, dimensions, entry);
-    if ( l == null ) {
-      System.out.println("WTF?");
-      findLeaf(root, coords, dimensions, entry);
-    }
-    assert (l != null) : "Could not find leaf for entry to delete";
-    assert (l.leaf) : "Entry is not found at leaf?!?";
-    ListIterator<Node> li = l.children.listIterator();
-    Integer removed = null;
-    while (li.hasNext())
-    {
-      @SuppressWarnings("unchecked")
-      Entry e = (Entry) li.next();
-      if (e.entry.equals(entry))
-      {
-        removed = e.entry;
-        li.remove();
-        break;
-      }
-    }
-    if (removed != null)
-    {
-      condenseTree(l);
-      size--;
-    }
-    if ( size == 0 )
-    {
-      root = buildRoot(true);
-    }
-    return (removed != null);
-  }
-
-  public boolean delete(float[] coords, T entry)
-  {
-    return delete(coords, pointDims, entry);
-  }
-
-  private Node findLeaf(Node n, float[] coords, float[] dimensions, T entry)
-  {
-    if (n.leaf)
-    {
-      for (Node c : n.children)
-      {
-        if (((Entry) c).entry.equals(entry))
-        {
-          return n;
-        }
-      }
-      return null;
-    }
-    else
-    {
-      for (Node c : n.children)
-      {
-        if (isOverlap(c.coords, c.dimensions, coords, dimensions))
-        {
-          Node result = findLeaf(c, coords, dimensions, entry);
-          if (result != null)
-          {
-            return result;
-          }
-        }
-      }
-      return null;
-    }
-  }
-
-  private void condenseTree(Node n)
-  {
-    Set<Node> q = new HashSet<Node>();
-    while (n != root)
-    {
-      if (n.leaf && (n.children.size() < minEntries))
-      {
-        q.addAll(n.children);
-        n.parent.children.remove(n);
-      }
-      else if (!n.leaf && (n.children.size() < minEntries))
-      {
-        // probably a more efficient way to do this...
-        LinkedList<Node> toVisit = new LinkedList<Node>(n.children);
-        while (!toVisit.isEmpty())
-        {
-          Node c = toVisit.pop();
-          if (c.leaf)
-          {
-            q.addAll(c.children);
-          }
-          else
-          {
-            toVisit.addAll(c.children);
-          }
-        }
-        n.parent.children.remove(n);
-      }
-      else
-      {
-        tighten(n);
-      }
-      n = n.parent;
-    }
-    if ( root.children.size() == 0 )
-    {
-      root = buildRoot(true);
-    }
-    else if ( (root.children.size() == 1) && (!root.leaf) )
-    {
-      root = root.children.get(0);
-      root.parent = null;
-    }
-    else
-    {
-      tighten(root);
-    }
-    for (Node ne : q)
-    {
-      @SuppressWarnings("unchecked")
-      Entry e = (Entry) ne;
-      insert(e.coords, e.dimensions, e.entry);
-    }
-    size -= q.size();
-  }
 
   /**
    * Empties the RTree
@@ -413,7 +275,7 @@ public class RTree<T>
     }
     LinkedList<Node> cc = new LinkedList<Node>(n.children);
     n.children.clear();
-    Node[] ss = seedPicker == SeedPicker.LINEAR ? lPickSeeds(cc) : qPickSeeds(cc);
+    Node[] ss = lPickSeeds(cc);
     nn[0].children.add(ss[0]);
     nn[1].children.add(ss[1]);
     tighten(nn);
@@ -435,7 +297,7 @@ public class RTree<T>
         tighten(nn); // Not sure this is required.
         return nn;
       }
-      Node c = seedPicker == SeedPicker.LINEAR ? lPickNext(cc) : qPickNext(cc, nn);
+      Node c = lPickNext(cc);
       Node preferred;
       float e0 = getRequiredExpansion(nn[0].coords, nn[0].dimensions, c);
       float e1 = getRequiredExpansion(nn[1].coords, nn[1].dimensions, c);
@@ -480,66 +342,7 @@ public class RTree<T>
     }
     return nn;
   }
-
-  // Implementation of Quadratic PickSeeds
-  private RTree<T>.Node[] qPickSeeds(LinkedList<Node> nn)
-  {
-    @SuppressWarnings("unchecked")
-    RTree<T>.Node[] bestPair = new RTree.Node[2];
-    float maxWaste = -1.0f * Float.MAX_VALUE;
-    for (Node n1: nn)
-    {
-      for (Node n2: nn)
-      {
-        if (n1 == n2) continue;
-        float n1a = getArea(n1.dimensions);
-        float n2a = getArea(n2.dimensions);
-        float ja = 1.0f;
-        for ( int i = 0; i < numDims; i++ )
-        {
-          float jc0 = Math.min(n1.coords[i], n2.coords[i]);
-          float jc1 = Math.max(n1.coords[i] + n1.dimensions[i], n2.coords[i] + n2.dimensions[i]);
-          ja *= (jc1 - jc0);
-        }
-        float waste = ja - n1a - n2a;
-        if ( waste > maxWaste )
-        {
-          maxWaste = waste;
-          bestPair[0] = n1;
-          bestPair[1] = n2;
-        }
-      }
-    }
-    nn.remove(bestPair[0]);
-    nn.remove(bestPair[1]);
-    return bestPair;
-  }
-
-  /**
-   * Implementation of QuadraticPickNext
-   * @param cc the children to be divided between the new nodes, one item will be removed from this list.
-   * @param nn the candidate nodes for the children to be added to.
-   */
-  private Node qPickNext(LinkedList<Node> cc, Node[] nn)
-  {
-    float maxDiff = -1.0f * Float.MAX_VALUE;
-    Node nextC = null;
-    for ( Node c: cc )
-    {
-      float n0Exp = getRequiredExpansion(nn[0].coords, nn[0].dimensions, c);
-      float n1Exp = getRequiredExpansion(nn[1].coords, nn[1].dimensions, c);
-      float diff = Math.abs(n1Exp - n0Exp);
-      if (diff > maxDiff)
-      {
-        maxDiff = diff;
-        nextC = c;
-      }
-    }
-    assert (nextC != null) : "No node selected from qPickNext";
-    cc.remove(nextC);
-    return nextC;
-  }
-
+  
   // Implementation of LinearPickSeeds
   private RTree<T>.Node[] lPickSeeds(LinkedList<Node> nn)
   {
@@ -716,9 +519,6 @@ public class RTree<T>
   private boolean isOverlap(float[] scoords, float[] sdimensions,
       float[] coords, float[] dimensions)
   {
-    //final float FUDGE_FACTOR=1.001f;
-    final float FUDGE_FACTOR=1.0f;
-    
     for (int i = 0; i < scoords.length; i++)
     {
       boolean overlapInThisDimension = false;
@@ -728,14 +528,14 @@ public class RTree<T>
       }
       else if (scoords[i] < coords[i])
       {
-        if (scoords[i] + FUDGE_FACTOR*sdimensions[i] >= coords[i])
+        if (scoords[i] + sdimensions[i] >= coords[i])
         {
           overlapInThisDimension = true;
         }
       }
       else if (scoords[i] > coords[i])
       {
-        if (coords[i] + FUDGE_FACTOR*dimensions[i] >= scoords[i])
+        if (coords[i] + dimensions[i] >= scoords[i])
         {
           overlapInThisDimension = true;
         }
@@ -787,44 +587,5 @@ public class RTree<T>
       return "Entry: " + entry;
     }
   } 
-
-  // The methods below this point can be used to create an HTML rendering
-  // of the RTree.  Maybe useful for debugging?
-  
-  private static final int elemWidth = 150;
-  private static final int elemHeight = 120;
-  
-  String visualize()
-  {
-    int ubDepth = (int)Math.ceil(Math.log(size)/Math.log(minEntries)) * elemHeight;
-    int ubWidth = size * elemWidth;
-    java.io.StringWriter sw = new java.io.StringWriter();
-    java.io.PrintWriter pw = new java.io.PrintWriter(sw);
-    pw.println( "<html><head></head><body>");
-    visualize(root, pw, 0, 0, ubWidth, ubDepth);
-    pw.println( "</body>");
-    pw.flush();
-    return sw.toString();
-  }
-  
-  private void visualize(Node n, java.io.PrintWriter pw, int x0, int y0, int w, int h)
-  {
-    pw.printf( "<div style=\"position:absolute; left: %d; top: %d; width: %d; height: %d; border: 1px dashed\">\n",
-               x0, y0, w, h);
-    pw.println( "<pre>");
-    pw.println( "Node: " + n.toString() + " (root==" + (n == root) + ") \n" );
-    pw.println( "Coords: " + Arrays.toString(n.coords) + "\n");
-    pw.println( "Dimensions: " + Arrays.toString(n.dimensions) + "\n");
-    pw.println( "# Children: " + ((n.children == null) ? 0 : n.children.size()) + "\n" );
-    pw.println( "isLeaf: " + n.leaf + "\n");
-    pw.println( "</pre>");
-    int numChildren = (n.children == null) ? 0 : n.children.size();
-    for ( int i = 0; i < numChildren; i++ )
-    {
-      visualize(n.children.get(i), pw, (int)(x0 + (i * w/(float)numChildren)),
-          y0 + elemHeight, (int)(w/(float)numChildren), h - elemHeight);
-    }
-    pw.println( "</div>" );
-  }
 }
 

@@ -51,7 +51,7 @@ public class MapController {
         float[] dimensions = new float[]{_latitudeSquare,_longitudeSquare};
         float[] coords = new float[]{x2,y2};
         
-        ArrayList<Location> data = LocationTree.findArea(coords,dimensions);
+        ArrayList<Location> data = MapService.findArea(coords,dimensions);
         
         while(data.size() < 10)
         {
@@ -61,7 +61,7 @@ public class MapController {
             coords[0] -= _latitudeAdjust;
             coords[1] -= _longitudeAdjust;
             
-            data = LocationTree.findArea(coords,dimensions);
+            data = MapService.findArea(coords,dimensions);
             
         }
         
@@ -87,7 +87,7 @@ public class MapController {
         float[] dimensions = new float[]{width,height};
         float[] coords = new float[]{x1,y1};
         
-        ArrayList<Location> data = LocationTree.findArea(coords,dimensions);
+        ArrayList<Location> data = MapService.findArea(coords,dimensions);
         
         return data;
     }
