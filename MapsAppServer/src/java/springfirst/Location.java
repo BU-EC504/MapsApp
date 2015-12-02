@@ -14,27 +14,27 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 public class Location implements Comparable<Location>{
 
-    public Location(String state,String province, double latitude, double longitude) {
+    public Location(String state,String province, float latitude, float longitude) {
         this.state = state;
         this.province = province;
         this.longitude = longitude;
         this.latitude = latitude;
     }
     
-    private double distance = Double.MAX_VALUE;
+    private float distance = Float.MAX_VALUE;
     
-    public double getDistance(){
+    public float getDistance(){
         return this.distance;
     }
     
-    public void setDistance(double _lat, double _long){
+    public void setDistance(float _lat, float _long){
         
         double x = Math.cos((Math.toRadians(this.latitude)+Math.toRadians(_lat))/2.0d);
         x = x * Math.toRadians(this.longitude - _long);
         
         double y = Math.toRadians(this.latitude - _lat);
         
-        this.distance = Math.sqrt(y*y + x*x) * 6371;
+        this.distance = (float)Math.sqrt(y*y + x*x) * 6371;
         
     }
     
