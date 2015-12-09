@@ -144,7 +144,7 @@ function initMap() {
                 markers.pop().setMap(null);
             }
            //selectedShape.setDraw(null);
-           map.setZoom(4);
+           //map.setZoom(4);
         }
         if(circle)
         {
